@@ -1,0 +1,54 @@
+    def derivative(self):
+        du = [0,0,0,0]
+        r = [0,0,0,0]
+
+        r[0] = self.u[0]
+        r[1] = self.u[1]
+        distance = math.sqrt(pow(r[0], 2) + pow(r[1], 2))
+
+
+        for i in range(2):
+            du[i] = self.u[i+2]
+            du[i+2] = -((1 + self.q) * r[i] ) / pow(distance, 3)
+
+        return du
+
+    def rk4(self):
+        leng = len(self.u) / self.u[0]
+        a = [self.h/2, self.h/2, self.h, 0]
+        b = [self.h/6, self.h/3, self.h/3, self.h/6]
+
+        u0 = [0,0,0,0]
+        ut = [0,0,0,0]
+
+        for i in range(int(leng)):
+            u0[i] = self.u[i]
+            ut[i] = 0
+
+        for j in range(4):
+            du = self.derivative()
+            for k in range(int(leng)):
+                self.u[k] = u0[k] + a[j] * du[k]
+                ut[k] = ut[k] + b[j] * du[k]
+
+        for i in range(int(leng)):
+            self.u[i] = u0[i] + ut[i]
+
+    def calculation_rk4(self):
+        for i in range(int(self.T / self.h)):
+            self.rk4()
+            self.calc_new_dimension()
+            print("%.lf", self.positions[0])
+            print("%.lf", self.positions[1])
+            print("%.lf", self.positions[2])
+            print("%.lf", self.positions[3])
+
+    def calc_new_dimension(self):
+        r = 1;
+        a1 = (self.mass_2/self.m12) * r;
+        a2 = (self.mass_1/self.m12) * r;
+
+        self.positions[0] = - a2 * self.u[0];
+        self.positions[1] = - a2 * self.u[1];
+        self.positions[2] = a1 * self.u[0];
+        self.positions[3] = a1 * self.u[1];
